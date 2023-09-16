@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package gogit;
+
+option go_package = "github.com/fardream/gogit";
+
+message Blob {
+  bytes header = 1;
+  string hex_digest = 2;
+  bytes blob = 3;
+}
