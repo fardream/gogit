@@ -7,6 +7,15 @@ import (
 	"encoding/hex"
 )
 
+type Object struct {
+	// header, "blob length-of-content" and terminating null byte.
+	Header []byte
+	// digest is the 20 byte sha-1 hash of header + content
+	Digest []byte
+	// Blob contains the actually zlib-compressed header + content of the blob.
+	Blob []byte
+}
+
 func (o *Object) HexDigest() string {
 	return hex.EncodeToString(o.Digest)
 }

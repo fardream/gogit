@@ -7,7 +7,26 @@ import (
 	"slices"
 )
 
-// WriteContent writes the content of the tree to the given io.Writer
+type TreeEntry struct {
+	Mode int32  `json:"mode,omitempty"`
+	Name string `json:"name,omitempty"`
+	Sha1 []byte `json:"sha1,omitempty"`
+}
+
+type Tree struct {
+	Entries []*TreeEntry
+}
+
+// NewTreeEntry creates a new [TreeEntry].
+func NewTreeEntry(mode Mode, name string, sha1 []byte) *TreeEntry {
+	return &TreeEntry{
+		Mode: int32(mode),
+		Name: name,
+		Sha1: sha1,
+	}
+}
+
+// WriteContent writes the content of the tree to the given [io.Writer].
 func (tree *Tree) WriteContent(w io.Writer) error {
 	for _, e := range tree.Entries {
 		mode := Mode(e.Mode)
@@ -47,7 +66,8 @@ func (tree *Tree) findName(name string) int {
 	})
 }
 
-func sortTreeEntryByName(l, r *TreeEntry) int {
+// compareTreeEntryByName can be supplied to [slices.SortFunc] and sort the tree entry list.
+func compareTreeEntryByName(l, r *TreeEntry) int {
 	switch {
 	case l.Name < r.Name:
 		return -1
@@ -72,13 +92,13 @@ func (tree *Tree) Add(mode Mode, name string, sha1 []byte) error {
 	tree.Entries = append(tree.Entries, entry)
 
 	slices.SortFunc(
-		tree.Entries, sortTreeEntryByName,
+		tree.Entries, compareTreeEntryByName,
 	)
 
 	return nil
 }
 
-// Replace an entry in the try by its name, error if not found.
+// Replace an entry in the tree by its name, error if not found.
 func (tree *Tree) Replace(mode Mode, name string, sha1 []byte) error {
 	idx := tree.findName(name)
 	if idx < 0 {
@@ -94,6 +114,7 @@ func (tree *Tree) Replace(mode Mode, name string, sha1 []byte) error {
 	return nil
 }
 
+// AddOrReplace will replace an entry if the name already exists, or add it to tree if the name doesn't exist.
 func (tree *Tree) AddOrReplace(mode Mode, name string, sha1 []byte) error {
 	entry := &TreeEntry{
 		Mode: int32(mode),
@@ -105,7 +126,7 @@ func (tree *Tree) AddOrReplace(mode Mode, name string, sha1 []byte) error {
 
 	if idx < 0 {
 		tree.Entries = append(tree.Entries, entry)
-		slices.SortFunc(tree.Entries, sortTreeEntryByName)
+		slices.SortFunc(tree.Entries, compareTreeEntryByName)
 	} else {
 		tree.Entries[idx] = entry
 	}
