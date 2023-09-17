@@ -1,1 +1,0 @@
-package gogit_test

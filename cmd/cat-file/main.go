@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -31,5 +33,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(string(content))
+	spew.Dump(content)
 }

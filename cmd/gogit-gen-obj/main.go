@@ -16,7 +16,7 @@ func main() {
 
 	flag.Parse()
 
-	blob, err := gogit.NewBlob([]byte(content))
+	blob, err := gogit.NewObject(gogit.ContentType_Blob, []byte(content))
 	if err != nil {
 		panic(err)
 	}

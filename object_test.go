@@ -8,7 +8,7 @@ import (
 
 func TestNewBlob(t *testing.T) {
 	content := "test content\n"
-	blob, err := gogit.NewBlob([]byte(content))
+	blob, err := gogit.NewObject(gogit.ContentType_Blob, []byte(content))
 	if err != nil {
 		t.Fatalf("failed to generate blob: %s", err.Error())
 	}

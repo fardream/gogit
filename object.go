@@ -7,13 +7,16 @@ import (
 	"encoding/hex"
 )
 
-func (blob *Blob) HexDigest() string {
-	return hex.EncodeToString(blob.Digest)
+func (o *Object) HexDigest() string {
+	return hex.EncodeToString(o.Digest)
 }
 
-func NewBlob(content []byte) (*Blob, error) {
+func NewObject(
+	contentType ContentType,
+	content []byte,
+) (*Object, error) {
 	l := len(content)
-	header, err := NewHeader(ContentType_Blob, l)
+	header, err := NewHeader(contentType, l)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +42,7 @@ func NewBlob(content []byte) (*Blob, error) {
 	}
 	z.Close()
 
-	return &Blob{
+	return &Object{
 		Header: header,
 		Digest: digest,
 		Blob:   b.Bytes(),
