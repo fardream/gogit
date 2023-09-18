@@ -4,20 +4,19 @@ import (
 	"bytes"
 	"compress/zlib"
 	"crypto/sha1"
-	"encoding/hex"
 )
 
 type Object struct {
 	// header, "blob length-of-content" and terminating null byte.
 	Header []byte
 	// digest is the 20 byte sha-1 hash of header + content
-	Digest []byte
+	Digest Sha1
 	// Blob contains the actually zlib-compressed header + content of the blob.
 	Blob []byte
 }
 
 func (o *Object) HexDigest() string {
-	return hex.EncodeToString(o.Digest)
+	return o.Digest.String()
 }
 
 func NewObject(
@@ -38,7 +37,8 @@ func NewObject(
 	if err != nil {
 		return nil, err
 	}
-	digest := hasher.Sum(nil)
+	digest := Sha1(hasher.Sum(nil)[:sha1Length])
+
 	var b bytes.Buffer
 	z := zlib.NewWriter(&b)
 	_, err = z.Write(header)
